@@ -1,0 +1,86 @@
+// src/content/posts/scott-meyers-item1.mdx
+---
+title: "Effective Modern C++: Understanding Template Type Deduction"
+date: "2024-01-02"
+author: "ZeroLatencyEdge"
+tags: ["c++", "templates", "scott-meyers", "type-deduction"]
+category: "Book Summaries"
+excerpt: "Deep dive into Item 1 of Scott Meyers' Effective Modern C++ with practical examples and common pitfalls."
+youtubeLinks: 
+  - id: "dQw4w9WgXcQ"  # Replace with actual video ID
+    title: "Template Type Deduction Explained"
+  - id: "abcdefghijk"  # Replace with actual video ID
+    title: "Universal References Deep Dive"
+---
+
+# Understanding Template Type Deduction
+
+When you call a template function, the compiler deduces the types involved. Scott Meyers breaks this down into three cases:
+
+## Case 1: ParamType is Reference or Pointer
+
+<CPPExample
+  title="Reference Type Deduction"
+  code={`template<typename T>
+void f(T& param);
+
+int x = 27;
+const int cx = x;
+const int& rx = x;
+
+f(x);   // T is int, paramType is int&
+f(cx);  // T is const int, paramType is const int&
+f(rx);  // T is const int, paramType is const int&`}
+  explanation="Reference-ness is ignored during type deduction. const-ness is preserved in the deduced type."
+/>
+
+## Case 2: ParamType is Universal Reference
+
+<CPPExample
+  title="Universal References (T&&)"
+  code={`template<typename T>
+void f(T&& param);  // Universal reference
+
+int x = 27;
+const int cx = x;
+const int& rx = x;
+
+f(x);   // x is lvalue, T is int&, paramType is int&
+f(cx);  // cx is const lvalue, T is const int&, paramType is const int&
+f(rx);  // rx is const lvalue, T is const int&, paramType is const int&
+f(27);  // 27 is rvalue, T is int, paramType is int&&`}
+  explanation="Universal references deduce T as either lvalue reference or value type based on the argument."
+/>
+
+## Key Takeaways
+
+1. **Reference collapsing**: `T& &`, `T& &&`, and `T&& &` collapse to `T&`
+2. **Array decay**: Array arguments decay to pointers (except when passed by reference)
+3. **Function decay**: Function arguments decay to function pointers
+
+## Performance Implications
+
+Understanding type deduction helps avoid unnecessary copies and enables perfect forwarding:
+
+<CPPExample
+  title="Perfect Forwarding Example"
+  code={`template<typename T>
+void process(T&& arg) {
+    // Perfectly forward arg to another function
+    other_function(std::forward<T>(arg));
+}
+
+// No unnecessary copies when passing lvalues or rvalues
+std::string data = "Hello";
+process(data);           // No copy, passes lvalue reference
+process(std::move(data)); // No copy, passes rvalue reference
+process("Temporary");    // Constructs in-place`}
+  explanation="Perfect forwarding eliminates unnecessary copies, crucial for low-latency applications."
+/>
+
+## YouTube Deep Dive
+
+<VideoEmbed
+  videoId="dQw4w9WgXcQ"  // Replace with your actual video ID
+  title="Template Type Deduction Explained"
+/>
