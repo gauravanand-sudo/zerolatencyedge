@@ -19,7 +19,6 @@ When you call a template function, the compiler deduces the types involved. Scot
 
 ## Case 1: ParamType is Reference or Pointer
 
-<CPPExample
   title="Reference Type Deduction"
   code={`template<typename T>
 void f(T& param);
@@ -36,7 +35,6 @@ f(rx);  // T is const int, paramType is const int&`}
 
 ## Case 2: ParamType is Universal Reference
 
-<CPPExample
   title="Universal References (T&&)"
   code={`template<typename T>
 void f(T&& param);  // Universal reference
@@ -62,7 +60,6 @@ f(27);  // 27 is rvalue, T is int, paramType is int&&`}
 
 Understanding type deduction helps avoid unnecessary copies and enables perfect forwarding:
 
-<CPPExample
   title="Perfect Forwarding Example"
   code={`template<typename T>
 void process(T&& arg) {
